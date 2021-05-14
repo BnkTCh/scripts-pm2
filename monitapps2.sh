@@ -37,9 +37,9 @@ varOff="$varOff1 $varOff2 $varOff3"
 if [[ $var != 1 ]]
 then
 	#echo "error en $varOff"
-	curl -H "Content-Type: application/json" -X POST   -d '{"sms":"Hay uno o más procesos que no se están ejecutando, por favor revisarlos"}' https://4fj5ga6su4.execute-api.us-east-1.amazonaws.com/default/bnkmonitapps
+	curl -H "Content-Type: application/json" -X POST   -d "{\"sms\":\"Los procesos $varOff no se están ejecutando, por favor revisarlos\"}" https://4fj5ga6su4.execute-api.us-east-1.amazonaws.com/default/bnkmonitapps
 #else
-	
+#echo "todo gucci"	
 fi 
 
 
