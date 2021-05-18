@@ -1,40 +1,52 @@
 #!/bin/bash
 
-proceso1=`pm2 status | sed '7q;d' | awk '{print $4,$18}' | grep -c online` #fiatapi
-proceso2=`pm2 status | sed '6q;d' | awk '{print $4,$18}' | grep -c online` #cleanup
-proceso3=`pm2 status | sed '5q;d' | awk '{print $4,$18}' | grep -c online` #checkbtcprice
+proceso1=`pm2 list | grep checkbtcprice | grep -c online` #checkbtcprice
+proceso2=`pm2 list | grep cleanup | grep -c online` #cleanup
+proceso3=`pm2 list | grep fiatapi | grep -c online` #fiatapi
 
-if [[ $proceso1 != 1 ]]
+if [[ $proceso1 = 1 ]]
 then
-  #echo "El proceso FIATAPI se encuentra detenido, por favor revisar"
-	var1="FIATAPI"       
+        varOn1="CHECKBTCPRICE"
 else
-        var=x
+	varOff1="CHECKBTCPRICE"		        	
 fi
 
 
-if [[ $proceso2 != 1 ]]
+if [[ $proceso2 = 1 ]]
 then
-  #echo "El proceso CLEANUP se encuentra detenido, por favor revisar"
-	var2="CLEANUP"
+        varOn2="CLEANUP"
 else
-        var=x
+	varOff2="CLEANUP"	
 fi
 
 
-if [[ $proceso3 != 1 ]]
+if [[ $proceso3 = 1 ]]
 then
-  #echo "El proceso CHECKBTCPRICE se encuentra detenido, por favor revisar"
-	var3="CHECKBTCPRICE"
+        varOn3="FIATAPI"	        
 else
-        var=x
+	varOff3="FIATAPI"	
 fi
 
+varOn="$varOn1 $varOn2 $varOn3"
+var=`echo $varOn | grep -c "$varOn"`
+varOff="$varOff1 $varOff2 $varOff3"
 
-if [[ $var != x ]]
+#mensaje="'{\"sms\":\"Los procesos $varOff no se están ejecutando por favor revisarlos\"}'"
+
+
+if [[ $var != 1 ]]
+
 then
-	echo "los servicios $var1 $var2 $var3 estan detenidos... aiuda!"
-fi
-echo $var
+	echo -e "\nerror en $varOff"
+	date +%c
+	pm2 list
+	curl -H "Content-Type: application/json" -X POST   -d "{\"sms\":\"Los procesos $varOff no se están ejecutando, por favor revisarlos\"}" https://4fj5ga6su4.execute-api.us-east-1.amazonaws.com/default/bnkmonitapps
+
+#else
+#	echo -e "\ntodo OK"
+#	date +%c	
+fi 
+
 
 exit
+
